@@ -1,0 +1,165 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alarma Sísmica CA</title>
+<link rel="stylesheet" href="style.css?v=2">
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+</head>
+<body>
+<div class="app-shell">
+  <div class="page-grid">
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-icon">🏠</div>
+        <div class="brand-copy">
+          <p class="brand-title">ALARMA SÍSMICA</p>
+          <p class="brand-subtitle">C A</p>
+        </div>
+      </div>
+      <nav class="menu">
+        <a class="menu-item active"><span class="menu-icon">🏠</span><span>INICIO</span></a>
+        <a class="menu-item"><span class="menu-icon">📈</span><span>MONITOREO</span></a>
+        <a class="menu-item"><span class="menu-icon">📜</span><span>HISTORIAL</span></a>
+        <a class="menu-item"><span class="menu-icon">⚙️</span><span>CONFIGURACIÓN</span></a>
+        <a class="menu-item"><span class="menu-icon">ℹ️</span><span>INFORMACIÓN</span></a>
+      </nav>
+      <div class="sidebar-card">
+        <p class="sidebar-card-title">SISTEMA INTELIGENTE</p>
+        <p class="sidebar-card-text">Protegemos lo que más importa.</p>
+        <div class="sidebar-wave"></div>
+      </div>
+    </aside>
+    <main class="main-panel">
+      <header class="main-header">
+        <div class="header-title-group">
+          <p class="title-label">ALARMA <span class="title-highlight">SÍSMICA</span> CA</p>
+          <p class="title-subtitle">Sistema de alerta temprana</p>
+        </div>
+        <div class="header-right">
+          <div class="status-pill">
+            <span class="status-dot"></span>
+            <div>
+              <p id="conexion" class="status-text">CONECTADO</p>
+              <p class="status-detail">ESP32 ONLINE</p>
+            </div>
+          </div>
+          <div class="clock-card">
+            <span class="clock-icon">⏱</span>
+            <div>
+              <p id="horaActual">00:00:00</p>
+              <p id="fechaActual">24 / 05 / 2026</p>
+            </div>
+          </div>
+        </div>
+      </header>
+      <section class="dashboard-grid">
+        <article class="hero-card">
+          <div class="hero-card-inner">
+            <div class="hero-display">
+              <div class="hero-badge">
+                <span>⚠️</span>
+              </div>
+              <div class="hero-wave"></div>
+            </div>
+            <div class="hero-copy">
+              <p class="hero-label">DETECCIÓN DE SISMOS EN TIEMPO REAL</p>
+              <h1 id="estadoSismo">SISMO DETECTADO</h1>
+              <p id="sismoEstado" class="hero-subtext">ALERTA SÍSMICA ACTIVA</p>
+              <p id="sismoDetalle" class="hero-detail">Ubicación: -- | Magnitud: 0.0</p>
+            </div>
+          </div>
+          <div class="hero-footer">
+            <div class="magnitud-card">
+              <p>MAGNITUD ESTIMADA</p>
+              <strong id="magnitud">6.2</strong>
+            </div>
+          </div>
+        </article>
+        <article class="actions-panel">
+          <button class="btn btn-primary" onclick="activarAlarma()"><span class="btn-icon">🚨</span>ACTIVAR ALARMA</button>
+          <button class="btn btn-secondary" onclick="desactivarAlarma()"><span class="btn-icon">🔕</span>DESACTIVAR ALARMA</button>
+        </article>
+        <article class="status-grid">
+          <div class="mini-card">
+            <div class="mini-icon">📡</div>
+            <p>DETECCIÓN DE SISMOS EN TIEMPO REAL</p>
+            <span class="mini-status mini-status--green">ACTIVO</span>
+          </div>
+          <div class="mini-card">
+            <div class="mini-icon">🛡️</div>
+            <p>SISTEMA PROTEGIDO</p>
+            <span class="mini-status mini-status--green">ESTABLE</span>
+          </div>
+          <div class="mini-card">
+            <div class="mini-icon">🔔</div>
+            <p>NOTIFICACIONES HABILITADAS</p>
+            <span class="mini-status mini-status--green">ACTIVO</span>
+          </div>
+          <div class="mini-card">
+            <div class="mini-icon">🗄️</div>
+            <p>BASE DE DATOS CONECTADA</p>
+            <span class="mini-status mini-status--green">ONLINE</span>
+          </div>
+        </article>
+      </section>
+    </main>
+    <aside class="right-panel">
+      <div class="panel-card status-panel">
+        <p class="panel-title">ESTADO DEL SISTEMA</p>
+        <div class="system-item"><span class="system-icon">📶</span><span>Wi-Fi</span><strong id="wifi">CONECTADO</strong></div>
+        <div class="system-item"><span class="system-icon">📡</span><span>ESP32</span><strong id="esp32">ONLINE</strong></div>
+        <div class="system-item"><span class="system-icon">⚡</span><span>Relay</span><strong id="relay">ACTIVO</strong></div>
+        <div class="system-item"><span class="system-icon">🔊</span><span>Sirena</span><strong id="sirena">ENCENDIDA</strong></div>
+        <div class="system-item"><span class="system-icon">🔥</span><span>Firebase</span><strong id="firebase">CONECTADO</strong></div>
+      </div>
+      <div class="panel-card alerts-panel">
+        <p class="panel-title">ÚLTIMAS ALERTAS</p>
+        <ul class="alert-list" id="alertas">
+          <li class="alert-item alert-item--red">
+            <div>
+              <p class="alert-type">SISMO DETECTADO</p>
+              <p class="alert-time">24/05/2026 - 10:24:12</p>
+            </div>
+            <span class="alert-badge alert-badge--red">6.2</span>
+          </li>
+          <li class="alert-item alert-item--orange">
+            <div>
+              <p class="alert-type">SISMO DETECTADO</p>
+              <p class="alert-time">24/05/2026 - 09:11:07</p>
+            </div>
+            <span class="alert-badge alert-badge--orange">4.8</span>
+          </li>
+          <li class="alert-item alert-item--orange">
+            <div>
+              <p class="alert-type">SISMO DETECTADO</p>
+              <p class="alert-time">24/05/2026 - 07:45:33</p>
+            </div>
+            <span class="alert-badge alert-badge--orange">3.9</span>
+          </li>
+          <li class="alert-item alert-item--green">
+            <div>
+              <p class="alert-type">SISTEMA INICIADO</p>
+              <p class="alert-time">24/05/2026 - 06:30:00</p>
+            </div>
+            <span class="alert-badge alert-badge--green">OK</span>
+          </li>
+        </ul>
+      </div>
+      <div class="panel-card footer-panel">
+        <p class="footer-brand">Alarma Sísmica CA</p>
+        <p class="footer-text">Sistema de alerta temprana v1.0.0</p>
+        <div class="footer-social">
+          <span class="social-icon">📷</span>
+          <span class="social-icon">▶️</span>
+          <span class="social-icon">🎵</span>
+        </div>
+        <p class="footer-copy">© 2026 Alarma Sísmica CA | Todos los derechos reservados</p>
+      </div>
+    </aside>
+  </div>
+</div>
+<script src="app.js?v=3"></script>
+</body>
+</html>
